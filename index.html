@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Calendrier avec Texte Personnalisable et Quantième</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --base-color: #48484800;
+                --red-color: #e04f39;
+                --blue-color: #00a5df;
+                --orange-color: #fe8c27;
+                --green-color: #56c271;
+                --white-color: #FFFFFF;
+                --arrow-color: #00a5df;
+                --arrow-hover-color: #0056b3;
+                --link-color: #0038a1;
+                --link-hover-color: #000000;
+                --today-background-color: #007bff;
+                --today-text-color: #FFFFFF;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            html {
+                font-family: "Poppins", sans-serif;
+                font-size: 11px;
+                color: var(--white-color);
+                background-color: var(--base-color);
+            }
+            body {
+                margin: 0;
+                padding: 20px;
+            }
+            .calendar {
+                width: 225px;
+                margin: 0 auto;
+                padding: 20px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                background-color: #fff;
+                color: #000;
+                overflow-y: auto;
+            }
+            .additional-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .additional-header h2 {
+                font-size: 1.8rem;
+                color: var(--blue-color);
+                margin: 0;
+            }
+            .calendar-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            .month-year {
+                font-size: 1.25rem;
+                font-weight: 700;
+            }
+            .arrow {
+                font-size: 2rem;
+                color: var(--arrow-color);
+                cursor: pointer;
+                user-select: none;
+                transition: color 0.3s;
+                padding: 0 15px;
+            }
+            .arrow:hover {
+                color: var(--arrow-hover-color);
+            }
+            .quantieme {
+                text-align: center;
+                margin-bottom: 10px;
+                font-size: 1rem;
+                font-style: italic;
+                color: var(--blue-color);
+            }
+            .days-of-week {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                background-color: #f0f0f0;
+                padding: 10px 0;
+                text-align: center;
+            }
+            .days-of-week div {
+                font-weight: bold;
+            }
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                text-align: center;
+                margin-top: 10px;
+            }
+            .calendar-grid div {
+                padding: 15px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+            .calendar-grid div:hover {
+                background-color: #f7f7f7;
+                cursor: pointer;
+            }
+            .today {
+                background-color: var(--today-background-color);
+                color: var(--today-text-color);
+                border-radius: 50%;
+            }
+            .prev-date, .next-date {
+                color: #999;
+            }
+            .custom-text {
+                margin-top: 20px;
+                text-align: center;
+                font-size: 1rem;
+                text-decoration: underline;
+                color: var(--link-color);
+                transition: color 0.3s;
+            }
+            .custom-text:hover {
+                color: var(--link-hover-color);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="calendar">
+            <div class="calendar-header">
+                <span class="arrow" id="prevMonth">&#8592;</span>
+                <span class="month-year" id="monthYear"></span>
+                <span class="arrow" id="nextMonth">&#8594;</span>
+            </div>
+            <div class="quantieme" id="quantieme"></div> <!-- Conteneur pour afficher le quantième -->
+            <div class="days-of-week">
+                <div>Dim</div>
+                <div>Lun</div>
+                <div>Mar</div>
+                <div>Mer</div>
+                <div>Jeu</div>
+                <div>Ven</div>
+                <div>Sam</div>
+            </div>
+            <div class="calendar-grid" id="calendarDays"></div>
+            <div class="custom-text">
+                <a href="https://liam.assurance-maladie.fr/ng/app/calendar/home" target="_blank">Accéder au calendrier</a>
+            </div>
+        </div>
+        <script>
+            const colorList = [
+                { base: '#00a5df', hover: '#0056b3' },
+                { base: '#EF7C10', hover: '#EF7C10' },
+                { base: '#56c271', hover: '#3da55a' },
+                { base: '#FBC02C', hover: '#FBC02C' },
+                { base: '#833D90', hover: '#833D90' },
+                { base: '#E9417A', hover: '#E9417A' },
+                { base: '#2A388D', hover: '#2A388D' },
+                { base: '#82C284', hover: '#82C284' },
+                { base: '#02ACC1', hover: '#02ACC1' },
+                { base: '#C2185B', hover: '#C2185B' },
+                { base: '#6D4C42', hover: '#6D4C42' },
+                { base: '#E63935', hover: '#E63935' }
+            ];
+            const selectedColor = colorList[Math.floor(Math.random() * colorList.length)];
+            document.documentElement.style.setProperty('--arrow-color', selectedColor.base);
+            document.documentElement.style.setProperty('--arrow-hover-color', selectedColor.hover);
+            document.documentElement.style.setProperty('--today-background-color', selectedColor.base);
+            document.documentElement.style.setProperty('--today-text-color', '#FFFFFF');
+        </script>
+        <script>
+            const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", 
+                                "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+            let currentDate = new Date();
+            
+            function renderCalendar() {
+                const monthYear = document.getElementById('monthYear');
+                const calendarDays = document.getElementById('calendarDays');
+                const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+                const firstDayIndex = firstDay.getDay();
+                const lastDayIndex = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDay();
+                const nextDays = 7 - lastDayIndex - 1;
+                
+                // Afficher mois et année
+                monthYear.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+                
+                // Réinitialiser les jours du calendrier
+                calendarDays.innerHTML = '';
+                
+                // Affichage des jours précédents du mois
+                for (let x = firstDayIndex; x > 0; x--) {
+                    const day = document.createElement('div');
+                    day.classList.add('prev-date');
+                    day.textContent = new Date(currentDate.getFullYear(), currentDate.getMonth(), -x + 1).getDate();
+                    calendarDays.appendChild(day);
+                }
+
+                // Affichage des jours du mois actuel
+                for (let i = 1; i <= lastDay; i++) {
+                    const day = document.createElement('div');
+                    const today = new Date();
+                    if (i === today.getDate() && currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear()) {
+                        day.classList.add('today');
+                    }
+                    day.textContent = i;
+                    calendarDays.appendChild(day);
+                }
+
+                // Affichage des jours du mois suivant
+                for (let j = 1; j <= nextDays; j++) {
+                    const day = document.createElement('div');
+                    day.classList.add('next-date');
+                    day.textContent = j;
+                    calendarDays.appendChild(day);
+                }
+
+                // Calculer et afficher le quantième
+                const date = new Date();
+                const start = new Date(date.getFullYear(), 0, 0);  // Début de l'année
+                const diff = date - start;  // Différence en millisecondes
+                const oneDay = 1000 * 60 * 60 * 24;  // Nombre de millisecondes dans un jour
+                const dayOfYear = Math.floor(diff / oneDay);  // Calcul du quantième
+
+                // Afficher le quantième dans l'élément avec l'id "quantieme"
+                const quantiemeElement = document.getElementById('quantieme');
+                quantiemeElement.textContent = `Quantième : ${dayOfYear}`;
+            }
+
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+
+            renderCalendar(); // Afficher le calendrier au chargement de la page
+        </script>
+    </body>
+</html>
